@@ -1,0 +1,52 @@
+{
+  "name": "kairos",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
+    "@emotion/react": "^11.11.3",
+    "@emotion/styled": "^11.11.0",
+    "@mui/icons-material": "^5.16.12",
+    "@mui/lab": "^5.0.0-alpha.155",
+    "@mui/material": "^5.15.1",
+    "@react-oauth/google": "^0.12.1",
+    "axios": "^1.7.9",
+    "cra-template": "1.2.0",
+    "date-fns": "^4.1.0",
+    "react": "18.2.0",
+    "react-beautiful-dnd": "^13.1.1",
+    "react-confetti": "^6.1.0",
+    "react-dom": "18.2.0",
+    "react-pull-to-refresh": "^2.0.1",
+    "react-scripts": "5.0.1"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11"
+  }
+}
