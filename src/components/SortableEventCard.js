@@ -1,28 +1,40 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { EventCard } from './EventCard';
+import { memo } from 'react';
 
-export function SortableEventCard(props) {
+export const SortableEventCard = memo(({ 
+  event,
+  activeTask,
+  onStartTask,
+  onEndTask,
+  onCancelTask,
+  onDeleteEvent,
+  calendarColor
+}) => {
   const {
     attributes,
     listeners,
     setNodeRef,
     transform,
     transition,
-    isDragging,
-  } = useSortable({ id: props.event.id });
+  } = useSortable({ id: event.id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    position: 'relative',
-    zIndex: isDragging ? 999 : 1,
   };
 
   return (
     <div ref={setNodeRef} style={style}>
       <EventCard 
-        {...props}
+        event={event}
+        activeTask={activeTask}
+        onStartTask={onStartTask}
+        onEndTask={onEndTask}
+        onCancelTask={onCancelTask}
+        onDeleteEvent={onDeleteEvent}
+        calendarColor={calendarColor}
         dragHandleProps={{
           ...attributes,
           ...listeners,
@@ -31,6 +43,6 @@ export function SortableEventCard(props) {
       />
     </div>
   );
-}
+});
 
-export default SortableEventCard; 
+SortableEventCard.displayName = 'SortableEventCard'; 

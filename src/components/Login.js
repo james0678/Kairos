@@ -1,5 +1,6 @@
 import { useGoogleLogin } from '@react-oauth/google';
 import { Box, Typography, Button } from '@mui/material';
+import GoogleIcon from '@mui/icons-material/Google';
 
 const Login = ({ onLoginSuccess }) => {
   const login = useGoogleLogin({
@@ -20,23 +21,31 @@ const Login = ({ onLoginSuccess }) => {
 
   return (
     <Box
-      display="flex"
-      flexDirection="column"
-      alignItems="center"
-      justifyContent="center"
-      minHeight="100vh"
-      gap={3}
+      sx={{
+        height: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        textAlign: 'center',
+        p: 3
+      }}
     >
-      <Typography variant="h4">Time Tracker</Typography>
-      <Typography variant="body1" gutterBottom>
-        구글 캘린더와 연동하여 계획된 시간과 실제 사용 시간을 비교해보세요
+      <Typography variant="h1" gutterBottom>
+        Kairos
       </Typography>
-      <Button 
-        variant="contained" 
-        color="primary"
+      
+      <Typography variant="h5" color="textSecondary" sx={{ mb: 4 }}>
+        Cronos to Kairos
+      </Typography>
+
+      <Button
+        variant="contained"
+        size="large"
         onClick={() => login()}
+        startIcon={<GoogleIcon />}
       >
-        Google 계정으로 로그인
+        GOOGLE 계정으로 로그인
       </Button>
     </Box>
   );

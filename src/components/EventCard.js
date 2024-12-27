@@ -81,6 +81,8 @@ export const EventCard = ({
               display: 'flex', 
               gap: 1,
               mt: 2,
+              position: 'relative',
+              zIndex: 10,
               '& .MuiButton-root': {
                 cursor: 'pointer !important',
                 '&:hover': {
@@ -88,13 +90,22 @@ export const EventCard = ({
                 }
               }
             }}
-            onClick={(e) => e.stopPropagation()}
+            onMouseDown={(e) => {
+              e.stopPropagation();
+              console.log('Button container clicked');
+            }}
           >
             <Button
               variant="outlined"
               color="error"
-              onClick={(e) => {
+              onMouseDown={(e) => {
                 e.stopPropagation();
+                console.log('Delete button mousedown:', event.id);
+              }}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Delete button clicked for event:', event.id);
                 onDeleteEvent(event.id);
               }}
             >
@@ -102,8 +113,14 @@ export const EventCard = ({
             </Button>
             <Button
               variant="contained"
-              onClick={(e) => {
+              onMouseDown={(e) => {
                 e.stopPropagation();
+                console.log('Start button mousedown:', event.id);
+              }}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Start button clicked for event:', event.id);
                 onStartTask(event.id);
               }}
               disabled={!!activeTask}

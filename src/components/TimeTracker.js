@@ -87,7 +87,12 @@ const TimeTracker = ({ token, onLogout }) => {
   const [error, setError] = useState(null);
 
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        delay: 10,
+        tolerance: 5,
+      }
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
@@ -95,7 +100,9 @@ const TimeTracker = ({ token, onLogout }) => {
 
   const handleDragEnd = (event) => {
     const { active, over } = event;
-
+    
+    if (!active || !over) return;
+    
     if (active.id !== over.id) {
       setEvents((items) => {
         const oldIndex = items.findIndex(item => item.id === active.id);
@@ -304,7 +311,7 @@ const TimeTracker = ({ token, onLogout }) => {
       if (response.ok) {
         const data = await response.json();
         
-        // 4. 새 이벤트 추가 (기존 이벤트는 유지)
+        // 4. 새 이벤트 추가 (기존 이벤트는 ���지)
         setEvents(prevEvents => {
           const newEvents = [
             ...prevEvents,
@@ -332,16 +339,22 @@ const TimeTracker = ({ token, onLogout }) => {
     }
   };
 
-  const handleStartTask = (eventId) => {
+  const handleStartTask = useCallback((eventId) => {
+    console.log('TimeTracker - handleStartTask called with:', eventId);
     const event = events.find(e => e.id === eventId);
-    if (!event) return;
+    console.log('Found event:', event);
+    if (!event) {
+      console.log('Event not found:', eventId);
+      return;
+    }
 
+    console.log('Setting active task for event:', event.summary);
     setActiveTask({
       eventId,
-      startTime: new Date().toISOString(),
+      startTime: new Date(),
       calendarId: event.calendar?.id || event.id.split('@')[0]
     });
-  };
+  }, [events]);
 
   // Kairos 캘린더 확인/생성
   const ensureKairosCalendar = useCallback(async () => {
@@ -390,7 +403,7 @@ const TimeTracker = ({ token, onLogout }) => {
     }
   }, [token]);
 
-  // 컴포넌트 마운��� 시 Kairos 캘린더 확인
+  // 컴포넌트 ���운트 시 Kairos 캘린더 확인
   useEffect(() => {
     ensureKairosCalendar();
   }, [ensureKairosCalendar]);
@@ -559,18 +572,24 @@ const TimeTracker = ({ token, onLogout }) => {
   };
 
   // 이벤트 삭제 핸들러 수정
-  const handleDeleteEvent = async (eventId) => {
+  const handleDeleteEvent = useCallback(async (eventId) => {
+    console.log('TimeTracker - handleDeleteEvent called with:', eventId);
     try {
       const event = events.find(e => e.id === eventId);
-      if (!event) return;
+      console.log('Found event to delete:', event);
+      if (!event) {
+        console.log('Event not found:', eventId);
+        return;
+      }
 
-      // 휴지통에 추가
+      console.log('Deleting event:', event.summary);
+      // Add to trash
       setDeletedEvents(prev => [...prev, {
         ...event,
         calendarId: event.calendar?.id || event.id.split('@')[0]
       }]);
 
-      // UI에서 제거
+      // Remove from UI first
       setEvents(prev => prev.filter(e => e.id !== eventId));
 
       const calendarId = event.calendar?.id || event.id.split('@')[0];
@@ -586,16 +605,13 @@ const TimeTracker = ({ token, onLogout }) => {
       );
 
       if (!response.ok && response.status !== 404) {
-        // 실패 시 롤백
-        setDeletedEvents(prev => prev.filter(e => e.id !== eventId));
-        setEvents(prev => [...prev, event]);
         throw new Error('Failed to delete event');
       }
     } catch (error) {
       console.error('Failed to delete event:', error);
       alert('일정 삭제에 실패했습니다.');
     }
-  };
+  }, [events, token]);
 
   const handleRefresh = async () => {
     // 새로고침 로직
