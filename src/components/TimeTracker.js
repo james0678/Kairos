@@ -24,6 +24,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { SortableEventCard } from './SortableEventCard';
+import { restrictToVerticalAxis, restrictToParentElement } from '@dnd-kit/modifiers';
 
 const CalendarCheckbox = ({ calendar, checked, loading, onChange }) => {
   return (
@@ -85,12 +86,14 @@ const TimeTracker = ({ token, onLogout }) => {
   });
   const lastTimeRange = useRef(null);
   const [error, setError] = useState(null);
+  const containerRef = useRef(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
         delay: 10,
         tolerance: 5,
+        distance: 1,
       }
     }),
     useSensor(KeyboardSensor, {
@@ -436,7 +439,7 @@ const TimeTracker = ({ token, onLogout }) => {
         `쉬는 시간 총 소요시간: ${messageObj?.totalBreakTime || '0분'}`,
         '',
         `실제 소요 시간: ${messageObj.description.match(/실제 소요 시간: (.*?)\n/)?.[1] || '0분'}`,
-        messageObj.uiMessage.split('\n\n')[0],  // Add the "일찍 끝내셨네요" message
+        messageObj.uiMessage.split('\n\n')[0],  // Add the "일찍 끝내셨요" message
         '',
         '피드백:',
         messageObj.uiMessage.split('피드백:\n')[1] || ''  // Get the feedback from uiMessage
@@ -513,7 +516,7 @@ const TimeTracker = ({ token, onLogout }) => {
     setActiveTask(null);
   };
 
-  // 날짜/시간 형식을 안전하게 처리하는 헬퍼 함수 추가
+  // 날/시간 형식을 안전하게 처리하는 헬퍼 함수 추가
   const formatEventTime = (dateTimeString) => {
     try {
       if (!dateTimeString) return '';
@@ -719,33 +722,36 @@ const TimeTracker = ({ token, onLogout }) => {
                     오늘 예정된 일정이 없습니다.
                   </Typography>
                 ) : (
-                  <DndContext
-                    sensors={sensors}
-                    collisionDetection={closestCenter}
-                    onDragEnd={handleDragEnd}
-                  >
-                    <SortableContext
-                      items={events.map(e => e.id)}
-                      strategy={verticalListSortingStrategy}
+                  <Box ref={containerRef} sx={{ position: 'relative', minHeight: '100vh' }}>
+                    <DndContext
+                      sensors={sensors}
+                      collisionDetection={closestCenter}
+                      onDragEnd={handleDragEnd}
+                      modifiers={[restrictToVerticalAxis, restrictToParentElement]}
                     >
-                      <Box>
-                        {events.map((event) => (
-                          <SortableEventCard
-                            key={event.id}
-                            event={event}
-                            activeTask={activeTask}
-                            onStartTask={handleStartTask}
-                            onEndTask={handleEndTask}
-                            onCancelTask={handleCancelTask}
-                            onDeleteEvent={handleDeleteEvent}
-                            calendarColor={calendars.find(cal => 
-                              cal.id === (event.calendar?.id || event.id.split('@')[0])
-                            )?.backgroundColor}
-                          />
-                        ))}
-                      </Box>
-                    </SortableContext>
-                  </DndContext>
+                      <SortableContext
+                        items={events.map(e => e.id)}
+                        strategy={verticalListSortingStrategy}
+                      >
+                        <Box>
+                          {events.map((event) => (
+                            <SortableEventCard
+                              key={event.id}
+                              event={event}
+                              activeTask={activeTask}
+                              onStartTask={handleStartTask}
+                              onEndTask={handleEndTask}
+                              onCancelTask={handleCancelTask}
+                              onDeleteEvent={handleDeleteEvent}
+                              calendarColor={calendars.find(cal => 
+                                cal.id === (event.calendar?.id || event.id.split('@')[0])
+                              )?.backgroundColor}
+                            />
+                          ))}
+                        </Box>
+                      </SortableContext>
+                    </DndContext>
+                  </Box>
                 )}
               </>
             )}
