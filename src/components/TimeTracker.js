@@ -311,7 +311,7 @@ const TimeTracker = ({ token, onLogout }) => {
       if (response.ok) {
         const data = await response.json();
         
-        // 4. 새 이벤트 추가 (기존 이벤트는 ���지)
+        // 4. 새 이벤트 추가 (기존 이벤트는 지지)
         setEvents(prevEvents => {
           const newEvents = [
             ...prevEvents,
@@ -403,7 +403,7 @@ const TimeTracker = ({ token, onLogout }) => {
     }
   }, [token]);
 
-  // 컴포넌트 ���운트 시 Kairos 캘린더 확인
+  // 컴포넌트 운트 시 Kairos 캘린더 확인
   useEffect(() => {
     ensureKairosCalendar();
   }, [ensureKairosCalendar]);

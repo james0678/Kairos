@@ -13,20 +13,16 @@ export const EventCard = ({
   dragHandleProps,
   isDraggable
 }) => {
-  const isActive = activeTask && activeTask.eventId === event.id;
-
-  // 설명에서 필요한 부분만 추출
   const getDisplayMessage = (description) => {
     if (!description) return null;
     
-    // Get the actual duration and feedback
     const actualDuration = description.match(/실제 소요 시간: (.*?)\n/)?.[1];
     const feedbackMatch = description.split('피드백:\n')[1];
     const feedback = feedbackMatch?.trim();
     
     return [
       actualDuration && `소요 시간: ${actualDuration}`,
-      feedback && feedback  // Only show feedback if it exists
+      feedback && feedback
     ].filter(Boolean).join('\n\n');
   };
 
@@ -43,93 +39,76 @@ export const EventCard = ({
         },
         backgroundColor: '#fff',
         borderRadius: '8px',
+        position: 'relative',
       }}
     >
       <div 
         {...(isDraggable ? dragHandleProps : {})} 
         style={{ 
+          cursor: isDraggable ? 'grab' : 'default',
           height: '100%',
-          cursor: isDraggable ? 'grab' : 'default'
+          width: '100%',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          zIndex: 1
+        }}
+      />
+
+      <CardContent sx={{ p: 3 }}>
+        <div>
+          <Typography variant="h6">
+            {event.summary}
+          </Typography>
+          
+          <Typography variant="body2" color="textSecondary">
+            계획된 시간: {formatEventTime(event.start.dateTime)} - {formatEventTime(event.end.dateTime)}
+          </Typography>
+
+          {event.description && (
+            <Typography 
+              variant="body2" 
+              color="textSecondary" 
+              sx={{ whiteSpace: 'pre-line', mt: 1 }}
+            >
+              {getDisplayMessage(event.description)}
+            </Typography>
+          )}
+        </div>
+      </CardContent>
+
+      <Box 
+        sx={{ 
+          display: 'flex', 
+          gap: 1,
+          p: 2,
+          pt: 0,
+          backgroundColor: 'transparent',
+          position: 'relative',
+          zIndex: 2
         }}
       >
-        <CardContent sx={{ p: 3 }}>
-          <div>
-            <Typography variant="h6">
-              {event.summary}
-            </Typography>
-            
-            <Typography variant="body2" color="textSecondary">
-              계획된 시간: {formatEventTime(event.start.dateTime)} - {formatEventTime(event.end.dateTime)}
-            </Typography>
-
-            {event.description && (
-              <Typography 
-                variant="body2" 
-                color="textSecondary" 
-                sx={{ 
-                  whiteSpace: 'pre-line',
-                  mt: 1
-                }}
-              >
-                {getDisplayMessage(event.description)}
-              </Typography>
-            )}
-          </div>
-
-          <Box 
-            sx={{ 
-              display: 'flex', 
-              gap: 1,
-              mt: 2,
-              position: 'relative',
-              zIndex: 10,
-              '& .MuiButton-root': {
-                cursor: 'pointer !important',
-                '&:hover': {
-                  cursor: 'pointer !important'
-                }
-              }
-            }}
-            onMouseDown={(e) => {
-              e.stopPropagation();
-              console.log('Button container clicked');
-            }}
-          >
-            <Button
-              variant="outlined"
-              color="error"
-              onMouseDown={(e) => {
-                e.stopPropagation();
-                console.log('Delete button mousedown:', event.id);
-              }}
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('Delete button clicked for event:', event.id);
-                onDeleteEvent(event.id);
-              }}
-            >
-              삭제하기
-            </Button>
-            <Button
-              variant="contained"
-              onMouseDown={(e) => {
-                e.stopPropagation();
-                console.log('Start button mousedown:', event.id);
-              }}
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('Start button clicked for event:', event.id);
-                onStartTask(event.id);
-              }}
-              disabled={!!activeTask}
-            >
-              시작하기
-            </Button>
-          </Box>
-        </CardContent>
-      </div>
+        <Button
+          variant="outlined"
+          color="error"
+          onClick={(e) => {
+            e.stopPropagation();
+            onDeleteEvent(event.id);
+          }}
+        >
+          삭제하기
+        </Button>
+        <Button
+          variant="contained"
+          onClick={(e) => {
+            e.stopPropagation();
+            onStartTask(event.id);
+          }}
+          disabled={!!activeTask}
+        >
+          시작하기
+        </Button>
+      </Box>
     </Card>
   );
 }; 

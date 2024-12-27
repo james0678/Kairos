@@ -110,7 +110,11 @@ export const CompletionModal = ({
   return (
     <Dialog
       open={open}
-      onClose={() => onClose(null)}
+      onClose={(event, reason) => {
+        // Prevent closing when clicking outside
+        if (reason === 'backdropClick') return;
+      }}
+      disableEscapeKeyDown
       maxWidth="sm"
       fullWidth
     >

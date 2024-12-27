@@ -216,7 +216,10 @@ export const ActiveTaskModal = ({
     <>
       <Dialog
         open={open}
-        onClose={onClose}
+        onClose={(event, reason) => {
+          if (reason === 'backdropClick') return;
+        }}
+        disableEscapeKeyDown
         maxWidth="sm"
         fullWidth
         keepMounted
@@ -297,6 +300,8 @@ export const ActiveTaskModal = ({
         breakTimes={breakTimes}
         onClose={handleCompletionClose}
         keepMounted
+        disableEscapeKeyDown
+        onBackdropClick={() => {}}
       />
 
       <AutoEndModal
@@ -305,6 +310,8 @@ export const ActiveTaskModal = ({
           setShowAutoEndModal(false);
           handleEndTask();
         }}
+        disableEscapeKeyDown
+        onBackdropClick={() => {}}
       />
     </>
   );
