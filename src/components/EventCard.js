@@ -45,53 +45,74 @@ export const EventCard = ({
         borderRadius: '8px',
       }}
     >
-      <CardContent sx={{ p: 3 }}>
-        <div {...(isDraggable ? dragHandleProps : {})} style={{ cursor: 'grab' }}>
-          <Typography variant="h6">
-            {event.summary}
-          </Typography>
-          
-          <Typography variant="body2" color="textSecondary">
-            계획된 시간: {formatEventTime(event.start.dateTime)} - {formatEventTime(event.end.dateTime)}
-          </Typography>
+      <div 
+        {...(isDraggable ? dragHandleProps : {})} 
+        style={{ 
+          height: '100%',
+          cursor: isDraggable ? 'grab' : 'default'
+        }}
+      >
+        <CardContent sx={{ p: 3 }}>
+          <div>
+            <Typography variant="h6">
+              {event.summary}
+            </Typography>
+            
+            <Typography variant="body2" color="textSecondary">
+              계획된 시간: {formatEventTime(event.start.dateTime)} - {formatEventTime(event.end.dateTime)}
+            </Typography>
 
-          {event.description && (
-            <Typography 
-              variant="body2" 
-              color="textSecondary" 
-              sx={{ 
-                whiteSpace: 'pre-line',
-                mt: 1
+            {event.description && (
+              <Typography 
+                variant="body2" 
+                color="textSecondary" 
+                sx={{ 
+                  whiteSpace: 'pre-line',
+                  mt: 1
+                }}
+              >
+                {getDisplayMessage(event.description)}
+              </Typography>
+            )}
+          </div>
+
+          <Box 
+            sx={{ 
+              display: 'flex', 
+              gap: 1,
+              mt: 2,
+              '& .MuiButton-root': {
+                cursor: 'pointer !important',
+                '&:hover': {
+                  cursor: 'pointer !important'
+                }
+              }
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Button
+              variant="outlined"
+              color="error"
+              onClick={(e) => {
+                e.stopPropagation();
+                onDeleteEvent(event.id);
               }}
             >
-              {getDisplayMessage(event.description)}
-            </Typography>
-          )}
-        </div>
-
-        <Box 
-          sx={{ 
-            display: 'flex', 
-            gap: 1,
-            mt: 2,
-          }}
-        >
-          <Button
-            variant="outlined"
-            color="error"
-            onClick={() => onDeleteEvent(event.id)}
-          >
-            삭제하기
-          </Button>
-          <Button
-            variant="contained"
-            onClick={() => onStartTask(event.id)}
-            disabled={!!activeTask}
-          >
-            시작하기
-          </Button>
-        </Box>
-      </CardContent>
+              삭제하기
+            </Button>
+            <Button
+              variant="contained"
+              onClick={(e) => {
+                e.stopPropagation();
+                onStartTask(event.id);
+              }}
+              disabled={!!activeTask}
+            >
+              시작하기
+            </Button>
+          </Box>
+        </CardContent>
+      </div>
     </Card>
   );
 }; 
