@@ -254,7 +254,7 @@ const QuickEventPage = () => {
         });
 
         // Check if we have a stored access token
-        const storedToken = localStorage.getItem('gapi_access_token');
+        const storedToken = localStorage.getItem('token');
         if (storedToken) {
           try {
             window.gapi.client.setToken({ access_token: storedToken });
@@ -264,44 +264,17 @@ const QuickEventPage = () => {
             setError(null);
             return;
           } catch (error) {
-            // Token is invalid, remove it and proceed with new authentication
-            localStorage.removeItem('gapi_access_token');
+            // Token is invalid, remove it
+            localStorage.removeItem('token');
           }
         }
 
-        // Initialize Google Identity Services
-        const tokenClient = window.google.accounts.oauth2.initTokenClient({
-          client_id: process.env.REACT_APP_CLIENT_ID,
-          scope: 'https://www.googleapis.com/auth/calendar',
-          callback: async (response) => {
-            if (response.error) {
-              setError('Google Calendar 접근 권한이 거부되었습니다.');
-              return;
-            }
-
-            // Store the access token
-            localStorage.setItem('gapi_access_token', response.access_token);
-            
-            // Set the access token
-            window.gapi.client.setToken(response);
-
-            try {
-              // Ensure Kairos calendar exists
-              await ensureKairosCalendar();
-              setError(null);
-            } catch (error) {
-              console.error('Failed to ensure Kairos calendar:', error);
-              setError('Kairos 캘린더 생성에 실패했습니다.');
-            }
-          },
-        });
-
-        // Request the token
-        tokenClient.requestAccessToken({ prompt: '' });  // Remove 'consent' to use stored credentials
-
+        // If no valid token, show error
+        setError('Google Calendar 권한이 필요합니다. 다시 로그인해주세요.');
+        
       } catch (error) {
         console.error('Failed to initialize calendar:', error);
-        setError('Google Calendar 권한을 확인해주세요.');
+        setError('캘린더 초기화에 실패했습니다.');
       }
     };
 
