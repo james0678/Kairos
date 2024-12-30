@@ -1,4 +1,8 @@
-import { Box, Typography, Button, Card, CardContent } from '@mui/material';
+import { Box, Typography, Button, List, ListItem, ListItemIcon, ListItemText, IconButton } from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import RestoreIcon from '@mui/icons-material/Restore';
+import { iconMapping } from '../utils/iconMapping';
 import { formatEventTime } from '../utils/dateUtils';
 
 export const TrashBin = ({ 
@@ -10,78 +14,76 @@ export const TrashBin = ({
   calendarColors 
 }) => {
   return (
-    <Box p={3}>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-        <Typography variant="h5">휴지통</Typography>
-        <Box>
-          <Button 
-            variant="outlined" 
-            color="primary" 
-            onClick={onGoBack}
-            sx={{ mr: 1 }}
-          >
-            메인 화면으로 돌아가기
-          </Button>
-          <Button 
-            variant="contained" 
-            color="error" 
-            onClick={onEmptyTrash}
-          >
-            휴지통 비우기
-          </Button>
-        </Box>
+    <Box>
+      <Box sx={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center',
+        mb: 3 
+      }}>
+        <Button
+          startIcon={<ArrowBackIcon />}
+          onClick={onGoBack}
+        >
+          돌아가기
+        </Button>
+        <Button
+          startIcon={<DeleteForeverIcon />}
+          color="error"
+          onClick={onEmptyTrash}
+          disabled={deletedEvents.length === 0}
+        >
+          휴지통 비우기
+        </Button>
       </Box>
 
       {deletedEvents.length === 0 ? (
-        <Typography color="textSecondary">
-          휴지통이 비어있습니다.
+        <Typography variant="body1" sx={{ textAlign: 'center', mt: 4 }}>
+          휴지통이 비어있습니다
         </Typography>
       ) : (
-        deletedEvents.map((event) => (
-          <Card 
-            key={event.id} 
-            sx={{ 
-              mb: 2,
-              borderLeft: `4px solid ${calendarColors[event.calendarId] || '#757575'}`
-            }}
-          >
-            <CardContent>
-              <Box display="flex" alignItems="center" justifyContent="space-between" mb={1}>
-                <Typography variant="h6">{event.summary}</Typography>
-                <Box>
-                  <Button
-                    variant="outlined"
-                    color="primary"
-                    size="small"
-                    onClick={() => onRestoreEvent(event)}
-                    sx={{ mr: 1 }}
-                  >
-                    복구하기
-                  </Button>
-                  <Button
-                    variant="contained"
-                    color="error"
-                    size="small"
-                    onClick={() => onPermanentDelete(event.id)}
-                  >
-                    영구 삭제
-                  </Button>
-                </Box>
-              </Box>
-              {event.start?.dateTime && event.end?.dateTime && (
-                <Typography color="textSecondary">
-                  일정 시간: {formatEventTime(event.start.dateTime)} - 
-                  {formatEventTime(event.end.dateTime)}
-                </Typography>
-              )}
-              {event.description && (
-                <Typography color="textSecondary" sx={{ mt: 1 }}>
-                  {event.description}
-                </Typography>
-              )}
-            </CardContent>
-          </Card>
-        ))
+        <List>
+          {deletedEvents.map((event) => {
+            const Icon = iconMapping[event.iconName] || iconMapping.list;
+            
+            return (
+              <ListItem
+                key={event.id}
+                secondaryAction={
+                  <Box>
+                    <IconButton
+                      edge="end"
+                      onClick={() => onRestoreEvent(event)}
+                      sx={{ mr: 1 }}
+                    >
+                      <RestoreIcon />
+                    </IconButton>
+                    <IconButton
+                      edge="end"
+                      onClick={() => onPermanentDelete(event.id)}
+                      color="error"
+                    >
+                      <DeleteForeverIcon />
+                    </IconButton>
+                  </Box>
+                }
+                sx={{
+                  mb: 1,
+                  backgroundColor: 'background.paper',
+                  borderRadius: 1,
+                  borderLeft: `5px solid ${event.color}`,
+                }}
+              >
+                <ListItemIcon>
+                  <Icon sx={{ color: event.color }} />
+                </ListItemIcon>
+                <ListItemText 
+                  primary={event.title}
+                />
+              </ListItem>
+            );
+          })}
+        </List>
       )}
     </Box>
   );

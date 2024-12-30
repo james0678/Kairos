@@ -1,9 +1,15 @@
 import { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import GoogleAuthProvider from './components/GoogleAuthProvider';
 import Login from './components/Login';
 import TimeTracker from './components/TimeTracker';
+import QuickEventPage from './components/QuickEventPage';
+import CustomizePage from './components/CustomizePage';
+import Navigation from './components/Navigation';
 import { Box } from '@mui/material';
 import { CalendarProvider } from './contexts/CalendarContext';
+import { QuickEventsProvider } from './contexts/QuickEventsContext';
+import NewQuickEventPage from './components/NewQuickEventPage';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -46,20 +52,30 @@ function App() {
   };
 
   return (
-    <GoogleAuthProvider>
-      <CalendarProvider>
-        <Box sx={{ width: '100%', position: 'relative', minHeight: '100vh' }}>
-          {!isLoggedIn ? (
-            <Login onLoginSuccess={handleLoginSuccess} />
-          ) : (
-            <TimeTracker 
-              token={token} 
-              onLogout={handleLogout}
-            />
-          )}
-        </Box>
-      </CalendarProvider>
-    </GoogleAuthProvider>
+    <QuickEventsProvider>
+      <Router>
+        <GoogleAuthProvider>
+          <CalendarProvider>
+            <Box sx={{ width: '100%', position: 'relative', minHeight: '100vh' }}>
+              {!isLoggedIn ? (
+                <Login onLoginSuccess={handleLoginSuccess} />
+              ) : (
+                <>
+                  <Routes>
+                    <Route path="/" element={<QuickEventPage token={token} />} />
+                    <Route path="/calendar" element={<TimeTracker token={token} onLogout={handleLogout} />} />
+                    <Route path="/customize" element={<CustomizePage />} />
+                    <Route path="/customize/new" element={<NewQuickEventPage />} />
+                    <Route path="*" element={<Navigate to="/" replace />} />
+                  </Routes>
+                  <Navigation />
+                </>
+              )}
+            </Box>
+          </CalendarProvider>
+        </GoogleAuthProvider>
+      </Router>
+    </QuickEventsProvider>
   );
 }
 
